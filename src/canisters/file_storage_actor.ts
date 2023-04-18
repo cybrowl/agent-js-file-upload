@@ -39,9 +39,6 @@ export function get_canister(config: Config) {
 
   if (is_prod == false) {
     agent.fetchRootKey().catch((err) => {
-      console.warn(
-        "Unable to fetch root key. Check to ensure that your local replica is running"
-      );
       console.error(err);
     });
   }

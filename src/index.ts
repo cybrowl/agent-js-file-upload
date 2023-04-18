@@ -103,7 +103,7 @@ export class AssetManager {
       return await this.uploadChunk({ chunk, order, batchId });
     } catch (error) {
       if (retries > 0) {
-        console.warn(
+        console.log(
           `Retrying upload for chunk ${order} (${retries} retries remaining)`
         );
         await new Promise((resolve) => setTimeout(resolve, delay));
@@ -115,7 +115,7 @@ export class AssetManager {
           delay,
         });
       } else {
-        console.warn(`Failed to upload chunk ${order} after multiple retries`);
+        console.log(`Failed to upload chunk ${order} after multiple retries`);
         throw error;
       }
     }
