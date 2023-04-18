@@ -23,7 +23,7 @@ describe("Setup Actors", () => {
 
   // Test the getCanisterVersion method
   test("AssetManager.getCanisterVersion(): should return version number", async () => {
-    // const response = await asset_manager.getCanisterVersion();
-    // expect(response).toEqual(1n);
+    const response = await asset_manager.getCanisterVersion();
+    expect(response).toEqual(1n);
   });
 });
