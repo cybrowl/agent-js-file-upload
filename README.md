@@ -1,2 +1,3 @@
 # agent-js-file-upload
-I gave up on integrating with agent-js and decided to test my idea independently using a similar structure.
+
+Writing package in isolation to later integrate with `@dfinity/agent-js`
