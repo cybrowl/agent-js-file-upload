@@ -24,15 +24,11 @@ export interface AssetProperties {
   content_encoding: ContentEncoding;
 }
 export type Asset_ID = string;
-export type Chunk_ID = bigint;
 export type ContentEncoding = { GZIP: null } | { Identity: null };
 export interface FileStorage {
   assets_list: ActorMethod<[], Result_3>;
   chunks_size: ActorMethod<[], bigint>;
-  commit_batch: ActorMethod<
-    [string, Array<Chunk_ID>, AssetProperties],
-    Result_2
-  >;
+  commit_batch: ActorMethod<[string, AssetProperties], Result_2>;
   create_chunk: ActorMethod<[string, Uint8Array | number[], bigint], bigint>;
   delete_asset: ActorMethod<[Asset_ID], Result_1>;
   get: ActorMethod<[Asset_ID], Result>;
@@ -78,6 +74,5 @@ export type StreamingStrategy = {
     callback: [Principal, string];
   };
 };
-
 export type TimerId = bigint;
 export interface _SERVICE extends FileStorage {}

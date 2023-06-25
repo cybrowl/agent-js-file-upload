@@ -8,7 +8,8 @@ const { AssetManager } = require("../dist/index.js");
 // Identities
 let motoko_identity = Ed25519KeyIdentity.generate();
 
-const file_storage_canister_id = "tfuft-aqaaa-aaaaa-aaaoq-cai";
+// Change Me
+const file_storage_canister_id = "dqerg-34aaa-aaaaa-qaapq-cai";
 let asset_manager;
 
 beforeAll(() => {

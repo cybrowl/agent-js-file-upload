@@ -20,7 +20,6 @@ interface StoreOptions {
 
 interface CommitOptions {
   batch_id: string;
-  chunk_ids: string[];
   checksum: number;
   content_type?: string;
   filename?: string;
@@ -53,7 +52,6 @@ export class AssetManager {
 
     return await this.commit({
       batch_id,
-      chunk_ids,
       checksum,
       content_type,
       filename,
@@ -161,16 +159,15 @@ export class AssetManager {
 
   async commit({
     batch_id,
-    chunk_ids,
     checksum,
     content_type = "application/octet-stream",
     filename = "file",
   }: CommitOptions): Promise<object> {
-    if (batch_id === "" || chunk_ids.length === 0) {
-      throw new Error("batch_id and chunk_ids are required");
+    if (batch_id === "") {
+      throw new Error("batch_id is required");
     }
 
-    const response = await this._actor.commit_batch(batch_id, chunk_ids, {
+    const response = await this._actor.commit_batch(batch_id, {
       filename,
       checksum: checksum,
       content_encoding: { Identity: null },

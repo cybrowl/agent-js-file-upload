@@ -19,7 +19,6 @@ export const idlFactory = ({ IDL }) => {
     content_encoding: ContentEncoding,
   });
   const Result_3 = IDL.Variant({ ok: IDL.Vec(Asset), err: IDL.Text });
-  const Chunk_ID = IDL.Nat;
   const AssetProperties = IDL.Record({
     content_type: IDL.Text,
     filename: IDL.Text,
@@ -62,11 +61,7 @@ export const idlFactory = ({ IDL }) => {
   const FileStorage = IDL.Service({
     assets_list: IDL.Func([], [Result_3], ["query"]),
     chunks_size: IDL.Func([], [IDL.Nat], ["query"]),
-    commit_batch: IDL.Func(
-      [IDL.Text, IDL.Vec(Chunk_ID), AssetProperties],
-      [Result_2],
-      []
-    ),
+    commit_batch: IDL.Func([IDL.Text, AssetProperties], [Result_2], []),
     create_chunk: IDL.Func(
       [IDL.Text, IDL.Vec(IDL.Nat8), IDL.Nat],
       [IDL.Nat],
