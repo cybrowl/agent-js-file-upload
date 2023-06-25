@@ -1,7 +1,7 @@
 import { get_canister } from "./canisters/file_storage_actor";
 import CRC32 from "crc-32";
 import { v4 as uuidv4 } from "uuid";
-import { Buffer } from "node:buffer";
+import { Buffer } from "buffer";
 
 interface ActorConfig {
   is_prod: any;
