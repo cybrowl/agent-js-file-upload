@@ -25,7 +25,7 @@ beforeAll(() => {
 
 test("AssetManager.getCanisterVersion(): should return version number", async () => {
   const response = await asset_manager.getCanisterVersion();
-  expect(response).toEqual(1n);
+  expect(response).toEqual(2n);
 });
 
 test("AssetManager.store(): should store chunk data of video file to canister", async () => {
@@ -64,7 +64,6 @@ test("AssetManager.store() with retry logic: should fail to store chunk data of 
   const failingChunkIndex = 1;
   asset_manager.uploadChunk = async function ({ chunk, order, batchId }) {
     if (order === failingChunkIndex) {
-      // console.log(`Simulating failure for chunk ${order}`);
       throw new Error("Simulated upload failure");
     }
     return originalUploadChunk.call(this, { chunk, order, batchId });
@@ -100,7 +99,6 @@ test("AssetManager.store() with retry logic: should store chunk data of image fi
   asset_manager.uploadChunk = async function ({ chunk, order, batchId }) {
     if (order === failingChunkIndex && retryCount < allowedRetries) {
       retryCount++;
-      console.log(`Simulating failure for chunk ${order}`);
       throw new Error("Simulated upload failure");
     }
     return originalUploadChunk.call(this, { chunk, order, batchId });

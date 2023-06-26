@@ -29,6 +29,12 @@ export const idlFactory = ({ IDL }) => {
   const Result_2 = IDL.Variant({ ok: Asset_ID, err: IDL.Text });
   const Result_1 = IDL.Variant({ ok: IDL.Text, err: IDL.Text });
   const Result = IDL.Variant({ ok: Asset, err: IDL.Text });
+  const Health = IDL.Record({
+    assets_size: IDL.Int,
+    heap_mb: IDL.Int,
+    memory_mb: IDL.Int,
+    cycles: IDL.Int,
+  });
   const HeaderField = IDL.Tuple(IDL.Text, IDL.Text);
   const HttpRequest = IDL.Record({
     url: IDL.Text,
@@ -69,6 +75,7 @@ export const idlFactory = ({ IDL }) => {
     ),
     delete_asset: IDL.Func([Asset_ID], [Result_1], []),
     get: IDL.Func([Asset_ID], [Result], ["query"]),
+    get_health: IDL.Func([], [Health], ["query"]),
     http_request: IDL.Func([HttpRequest], [HttpResponse], ["query"]),
     http_request_streaming_callback: IDL.Func(
       [StreamingCallbackToken],

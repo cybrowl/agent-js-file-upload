@@ -102,9 +102,6 @@ export class AssetManager {
       return await this.uploadChunk({ chunk, order, batchId });
     } catch (error) {
       if (retries > 0) {
-        console.log(
-          `Retrying upload for chunk ${order} (${retries} retries remaining)`
-        );
         await new Promise((resolve) => setTimeout(resolve, delay));
         return this.uploadChunkWithRetry({
           chunk,

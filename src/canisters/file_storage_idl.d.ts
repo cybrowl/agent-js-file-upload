@@ -32,6 +32,7 @@ export interface FileStorage {
   create_chunk: ActorMethod<[string, Uint8Array | number[], bigint], bigint>;
   delete_asset: ActorMethod<[Asset_ID], Result_1>;
   get: ActorMethod<[Asset_ID], Result>;
+  get_health: ActorMethod<[], Health>;
   http_request: ActorMethod<[HttpRequest], HttpResponse>;
   http_request_streaming_callback: ActorMethod<
     [StreamingCallbackToken],
@@ -43,6 +44,12 @@ export interface FileStorage {
   version: ActorMethod<[], bigint>;
 }
 export type HeaderField = [string, string];
+export interface Health {
+  assets_size: bigint;
+  heap_mb: bigint;
+  memory_mb: bigint;
+  cycles: bigint;
+}
 export interface HttpRequest {
   url: string;
   method: string;
