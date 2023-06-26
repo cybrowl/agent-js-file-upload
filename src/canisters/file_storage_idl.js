@@ -63,11 +63,14 @@ export const idlFactory = ({ IDL }) => {
     token: IDL.Opt(StreamingCallbackToken),
     body: IDL.Vec(IDL.Nat8),
   });
-  const TimerId = IDL.Nat;
   const FileStorage = IDL.Service({
     assets_list: IDL.Func([], [Result_3], ["query"]),
     chunks_size: IDL.Func([], [IDL.Nat], ["query"]),
-    commit_batch: IDL.Func([IDL.Text, AssetProperties], [Result_2], []),
+    commit_batch: IDL.Func(
+      [IDL.Text, IDL.Vec(IDL.Nat), AssetProperties],
+      [Result_2],
+      []
+    ),
     create_chunk: IDL.Func(
       [IDL.Text, IDL.Vec(IDL.Nat8), IDL.Nat],
       [IDL.Nat],
@@ -83,8 +86,6 @@ export const idlFactory = ({ IDL }) => {
       ["query"]
     ),
     is_full: IDL.Func([], [IDL.Bool], ["query"]),
-    start_clear_expired_chunks: IDL.Func([], [TimerId], []),
-    stop_clear_expired_chunks: IDL.Func([], [TimerId], []),
     version: IDL.Func([], [IDL.Nat], ["query"]),
   });
   return FileStorage;
