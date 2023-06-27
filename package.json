@@ -1,6 +1,6 @@
 {
   "name": "agent-js-file-upload",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "author": "cyberowl <cybrowl@protonmail.com>",
   "license": "Apache-2.0",
   "description": "JavaScript library to manage assets on the Internet Computer",
@@ -54,8 +54,7 @@
   },
   "dependencies": {
     "crc-32": "^1.2.2",
-    "mime": "^3.0.0",
-    "uuid": "^9.0.0"
+    "mime": "^3.0.0"
   },
   "devDependencies": {
     "@peculiar/webcrypto": "^1.4.0",

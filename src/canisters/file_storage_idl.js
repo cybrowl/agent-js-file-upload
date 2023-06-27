@@ -5,6 +5,24 @@ export const idlFactory = ({ IDL }) => {
     GZIP: IDL.Null,
     Identity: IDL.Null,
   });
+  const AssetProperties = IDL.Record({
+    content_type: IDL.Text,
+    filename: IDL.Text,
+    checksum: IDL.Nat,
+    content_encoding: ContentEncoding,
+  });
+  const Asset_ID = IDL.Text;
+  const ErrCommitBatch = IDL.Variant({
+    ChecksumInvalid: IDL.Bool,
+    ChunkNotFound: IDL.Bool,
+    ChunkOwnerInvalid: IDL.Bool,
+  });
+  const Result_2 = IDL.Variant({ ok: Asset_ID, err: ErrCommitBatch });
+  const ErrDeleteAsset = IDL.Variant({
+    AssetNotFound: IDL.Bool,
+    NotAuthorized: IDL.Bool,
+  });
+  const Result_1 = IDL.Variant({ ok: IDL.Text, err: ErrDeleteAsset });
   const Asset = IDL.Record({
     id: IDL.Text,
     url: IDL.Text,
@@ -18,16 +36,6 @@ export const idlFactory = ({ IDL }) => {
     filename: IDL.Text,
     content_encoding: ContentEncoding,
   });
-  const Result_3 = IDL.Variant({ ok: IDL.Vec(Asset), err: IDL.Text });
-  const AssetProperties = IDL.Record({
-    content_type: IDL.Text,
-    filename: IDL.Text,
-    checksum: IDL.Nat32,
-    content_encoding: ContentEncoding,
-  });
-  const Asset_ID = IDL.Text;
-  const Result_2 = IDL.Variant({ ok: Asset_ID, err: IDL.Text });
-  const Result_1 = IDL.Variant({ ok: IDL.Text, err: IDL.Text });
   const Result = IDL.Variant({ ok: Asset, err: IDL.Text });
   const Health = IDL.Record({
     assets_size: IDL.Int,
@@ -64,20 +72,12 @@ export const idlFactory = ({ IDL }) => {
     body: IDL.Vec(IDL.Nat8),
   });
   const FileStorage = IDL.Service({
-    assets_list: IDL.Func([], [Result_3], ["query"]),
     chunks_size: IDL.Func([], [IDL.Nat], ["query"]),
-    commit_batch: IDL.Func(
-      [IDL.Text, IDL.Vec(IDL.Nat), AssetProperties],
-      [Result_2],
-      []
-    ),
-    create_chunk: IDL.Func(
-      [IDL.Text, IDL.Vec(IDL.Nat8), IDL.Nat],
-      [IDL.Nat],
-      []
-    ),
+    commit_batch: IDL.Func([IDL.Vec(IDL.Nat), AssetProperties], [Result_2], []),
+    create_chunk: IDL.Func([IDL.Vec(IDL.Nat8), IDL.Nat], [IDL.Nat], []),
     delete_asset: IDL.Func([Asset_ID], [Result_1], []),
     get: IDL.Func([Asset_ID], [Result], ["query"]),
+    get_all_assets: IDL.Func([], [IDL.Vec(Asset)], ["query"]),
     get_health: IDL.Func([], [Health], ["query"]),
     http_request: IDL.Func([HttpRequest], [HttpResponse], ["query"]),
     http_request_streaming_callback: IDL.Func(

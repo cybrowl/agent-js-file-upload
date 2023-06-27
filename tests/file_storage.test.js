@@ -23,9 +23,9 @@ beforeAll(() => {
   });
 });
 
-test("AssetManager.getCanisterVersion(): should return version number", async () => {
-  const response = await asset_manager.getCanisterVersion();
-  expect(response).toEqual(2n);
+test("AssetManager.version(): should return canister version number", async () => {
+  const response = await asset_manager.version();
+  expect(response).toEqual(4n);
 });
 
 test("AssetManager.store(): should store chunk data of video file to canister", async () => {
@@ -35,20 +35,23 @@ test("AssetManager.store(): should store chunk data of video file to canister", 
   const asset_file_name = path.basename(file_path);
   const asset_content_type = mime.getType(file_path);
 
-  const { ok: asset_id } = await asset_manager.store(asset_unit8Array, {
-    filename: asset_file_name,
-    content_type: asset_content_type,
-  });
+  const { ok: asset_id, err: error } = await asset_manager.store(
+    asset_unit8Array,
+    {
+      filename: asset_file_name,
+      content_type: asset_content_type,
+    }
+  );
 
-  const { ok: asset } = await asset_manager.getFile(asset_id);
+  const { ok: asset } = await asset_manager.getAsset(asset_id);
 
   expect(asset.filename).toEqual("bots.mp4");
   expect(asset.content_type).toEqual("video/mp4");
   expect(asset.content_size).toEqual(14272571n);
-}, 10000);
+}, 20000);
 
-test("AssetManager.listFiles(): should return all assets without file content data since it would be too large", async () => {
-  const { ok: asset_list } = await asset_manager.listFiles();
+test("AssetManager.getAllAssets(): should return all assets without file content data since it would be too large", async () => {
+  const asset_list = await asset_manager.getAllAssets();
   const hasAssets = asset_list.length > 0;
   expect(hasAssets).toBeTruthy();
 });
@@ -78,7 +81,7 @@ test("AssetManager.store() with retry logic: should fail to store chunk data of 
 
   asset_manager.uploadChunk = originalUploadChunk;
 
-  const { ok: asset_list } = await asset_manager.listFiles();
+  const asset_list = await asset_manager.getAllAssets();
   const fileExists = asset_list.some(
     (asset) => asset.filename === asset_file_name
   );
@@ -111,7 +114,7 @@ test("AssetManager.store() with retry logic: should store chunk data of image fi
 
   asset_manager.uploadChunk = originalUploadChunk;
 
-  const { ok: asset } = await asset_manager.getFile(asset_id);
+  const { ok: asset } = await asset_manager.getAsset(asset_id);
 
   expect(asset.filename).toEqual("pixels.jpeg");
   expect(asset.content_type).toEqual("image/jpeg");

@@ -1,6 +1,5 @@
 import { get_canister } from "./canisters/file_storage_actor";
 import CRC32 from "crc-32";
-import { v4 as uuidv4 } from "uuid";
 import { Buffer } from "buffer";
 
 interface ActorConfig {
@@ -20,7 +19,6 @@ interface StoreOptions {
 }
 
 interface CommitOptions {
-  batch_id: string;
   chunk_ids: number[];
   checksum: number;
   content_type?: string;
@@ -42,18 +40,12 @@ export class AssetManager {
   ): Promise<object> {
     this.validateFile(file);
 
-    const batch_id = this.generateBatchId();
     const chunkSize = 2000000;
-    const { promises, checksum } = this.createUploadPromises(
-      file,
-      chunkSize,
-      batch_id
-    );
+    const { promises, checksum } = this.createUploadPromises(file, chunkSize);
 
     const chunk_ids = await Promise.all(promises);
 
     return await this.commit({
-      batch_id,
       chunk_ids,
       checksum,
       content_type,
@@ -71,44 +63,35 @@ export class AssetManager {
     }
   }
 
-  generateBatchId(): string {
-    return uuidv4();
-  }
-
   async uploadChunk({
     chunk,
     order,
-    batchId,
   }: {
     chunk: Uint8Array;
     order: number;
-    batchId: string;
   }): Promise<any> {
-    return this._actor.create_chunk(batchId, chunk, order);
+    return this._actor.create_chunk(chunk, order);
   }
 
   async uploadChunkWithRetry({
     chunk,
     order,
-    batchId,
     retries = 3,
     delay = 1000,
   }: {
     chunk: Uint8Array;
     order: number;
-    batchId: string;
     retries?: number;
     delay?: number;
   }): Promise<any> {
     try {
-      return await this.uploadChunk({ chunk, order, batchId });
+      return await this.uploadChunk({ chunk, order });
     } catch (error) {
       if (retries > 0) {
         await new Promise((resolve) => setTimeout(resolve, delay));
         return this.uploadChunkWithRetry({
           chunk,
           order,
-          batchId,
           retries: retries - 1,
           delay,
         });
@@ -131,8 +114,7 @@ export class AssetManager {
 
   createUploadPromises(
     file: Uint8Array,
-    chunkSize: number,
-    batchId: string
+    chunkSize: number
   ): { promises: Promise<any>[]; checksum: number } {
     const promises = [];
     let checksum = 0;
@@ -149,7 +131,6 @@ export class AssetManager {
         this.uploadChunkWithRetry({
           chunk,
           order: index,
-          batchId,
         })
       );
     }
@@ -158,17 +139,20 @@ export class AssetManager {
   }
 
   async commit({
-    batch_id,
     chunk_ids,
     checksum,
     content_type = "application/octet-stream",
     filename = "file",
   }: CommitOptions): Promise<object> {
-    if (batch_id === "") {
-      throw new Error("batch_id is required");
+    if (chunk_ids.length < 1) {
+      throw new Error("chunk_ids is required");
     }
 
-    const response = await this._actor.commit_batch(batch_id, chunk_ids, {
+    const chunk_ids_sorted = chunk_ids.sort((a, b) =>
+      a < b ? -1 : a > b ? 1 : 0
+    );
+
+    const response = await this._actor.commit_batch(chunk_ids_sorted, {
       filename,
       checksum: checksum,
       content_encoding: { Identity: null },
@@ -178,19 +162,27 @@ export class AssetManager {
     return response;
   }
 
-  async listFiles(): Promise<any[]> {
-    return this._actor.assets_list();
+  async getAllAssets(): Promise<any[]> {
+    return this._actor.get_all_assets();
   }
 
-  async getFile(key: string): Promise<object> {
-    return this._actor.get(key);
+  async getAsset(id: string): Promise<object> {
+    return this._actor.get(id);
   }
 
-  async getTotalChunksSize(): Promise<number> {
+  async getHealth(): Promise<object> {
+    return this._actor.get_health();
+  }
+
+  async deleteAsset(id: string): Promise<object> {
+    return this._actor.delete_asset(id);
+  }
+
+  async chunksSize(): Promise<number> {
     return this._actor.chunks_size();
   }
 
-  async getCanisterVersion(): Promise<string> {
+  async version(): Promise<string> {
     return this._actor.version();
   }
 }
