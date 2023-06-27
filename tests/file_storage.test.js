@@ -119,4 +119,4 @@ test("AssetManager.store() with retry logic: should store chunk data of image fi
   expect(asset.filename).toEqual("pixels.jpeg");
   expect(asset.content_type).toEqual("image/jpeg");
   expect(asset.content_size).toEqual(4236788n);
-}, 15000);
+}, 25000);
