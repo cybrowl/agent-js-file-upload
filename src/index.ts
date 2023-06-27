@@ -148,11 +148,7 @@ export class AssetManager {
       throw new Error("chunk_ids is required");
     }
 
-    const chunk_ids_sorted = chunk_ids.sort((a, b) =>
-      a < b ? -1 : a > b ? 1 : 0
-    );
-
-    const response = await this._actor.commit_batch(chunk_ids_sorted, {
+    const response = await this._actor.commit_batch(chunk_ids, {
       filename,
       checksum: checksum,
       content_encoding: { Identity: null },
