@@ -39,7 +39,7 @@ export class AssetManager {
   async store(
     file: Uint8Array,
     { content_type, filename }: StoreOptions,
-    callback: ProgressCallback
+    callback: ProgressCallback = () => { }
   ): Promise<object> {
     callback(0);
 
