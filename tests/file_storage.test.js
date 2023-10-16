@@ -50,6 +50,35 @@ test("AssetManager.store(): should store chunk data of video file to canister", 
   expect(asset.content_size).toEqual(14272571n);
 }, 20000);
 
+test("AssetManager.store(): should call progress callback with increasing values", async () => {
+  const file_path = "tests/data/bots.mp4";
+  const asset_buffer = fs.readFileSync(file_path);
+  const asset_unit8Array = new Uint8Array(asset_buffer);
+  const asset_file_name = path.basename(file_path);
+  const asset_content_type = mime.getType(file_path);
+
+  const progress_received = [];
+
+  await asset_manager.store(
+    asset_unit8Array,
+    {
+      filename: asset_file_name,
+      content_type: asset_content_type,
+    },
+    (progress) => {
+      if (progress_received.length == 0) {
+        expect(progress).toEqual(0);
+      } else {
+        expect(progress).toBeGreaterThan(progress_received[progress_received.length - 1]);
+      }
+
+      progress_received.push(progress);
+    }
+  );
+
+  expect(progress_received[progress_received.length - 1]).toEqual(1);
+}, 20000);
+
 test("AssetManager.getAllAssets(): should return all assets without file content data since it would be too large", async () => {
   const asset_list = await asset_manager.getAllAssets();
   const hasAssets = asset_list.length > 0;

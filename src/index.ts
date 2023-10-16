@@ -25,6 +25,8 @@ interface CommitOptions {
   filename?: string;
 }
 
+type ProgressCallback = (progress: number) => void;
+
 export class AssetManager {
   private _actor: any;
 
@@ -36,12 +38,15 @@ export class AssetManager {
 
   async store(
     file: Uint8Array,
-    { content_type, filename }: StoreOptions
+    { content_type, filename }: StoreOptions,
+    callback: ProgressCallback = () => { }
   ): Promise<object> {
+    callback(0);
+
     this.validateFile(file);
 
     const chunkSize = 2000000;
-    const { promises, checksum } = this.createUploadPromises(file, chunkSize);
+    const { promises, checksum } = this.createUploadPromises(file, chunkSize, callback);
 
     const chunk_ids = await Promise.all(promises);
 
@@ -114,10 +119,14 @@ export class AssetManager {
 
   createUploadPromises(
     file: Uint8Array,
-    chunkSize: number
+    chunkSize: number,
+    callback: ProgressCallback
   ): { promises: Promise<any>[]; checksum: number } {
     const promises = [];
     let checksum = 0;
+
+    const totalToStore = file.length;
+    var totalStored = 0;
 
     for (
       let start = 0, index = 0;
@@ -131,7 +140,13 @@ export class AssetManager {
         this.uploadChunkWithRetry({
           chunk,
           order: index,
-        })
+        }).then((promise: Promise<any>) => {
+          totalStored += chunkSize;
+          totalStored = Math.min(totalStored, totalToStore);
+          callback(totalStored / totalToStore);
+          return promise;
+        }
+        )
       );
     }
 
